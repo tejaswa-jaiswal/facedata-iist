@@ -374,5 +374,6 @@ async def list_students():
 
 # Run with: uvicorn app:app --host 0.0.0.0 --port 8000
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(main, host="0.0.0.0", port=8000)
+    import uvicorn, os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
