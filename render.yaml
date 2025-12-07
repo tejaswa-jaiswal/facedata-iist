@@ -13,12 +13,10 @@ services:
     envVars:
       - key: DATA_FOLDER
         value: /data
-
       - key: UPLOAD_FOLDER
-        value: /uploads
+        value: /data/uploads
 
-    # Uncomment if you want persistent disk storage:
-    # disks:
-    #   - name: data-disk
-    #     mountPath: /data
-    #     sizeGB: 1
+    disks:
+      - name: data-disk
+        mountPath: /data
+        sizeGB: 1

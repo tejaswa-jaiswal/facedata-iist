@@ -7,10 +7,31 @@ import sqlite3
 import uuid
 import re
 from pathlib import Path
+import os
+from pathlib import Path
+
+def safe_mkdir(path_str):
+    """Try to create path_str; fallback to './data' on PermissionError."""
+    p = Path(path_str)
+    try:
+        p.mkdir(parents=True, exist_ok=True)
+        return str(p)
+    except PermissionError:
+        fallback = Path("data")
+        fallback.mkdir(parents=True, exist_ok=True)
+        return str(fallback)
+
+# read env vars (fall back to relative 'data' if not set)
+DATA_FOLDER = os.getenv("DATA_FOLDER", "data")
+DATA_FOLDER = safe_mkdir(DATA_FOLDER)
+
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", os.path.join(DATA_FOLDER, "uploads"))
+UPLOAD_FOLDER = safe_mkdir(UPLOAD_FOLDER)
+
 
 # --- Configuration (can override with environment variables) ---
-DATA_FOLDER = os.getenv("DATA_FOLDER", "data")       # default relative 'data' folder
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")  # default relative 'uploads' folder
+      # default relative 'data' folder
+# default relative 'uploads' folder
 MAX_FILE_BYTES = 5 * 1024 * 1024  # 5 MB
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg"}
 
