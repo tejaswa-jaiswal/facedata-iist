@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException,Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import os
@@ -74,6 +74,27 @@ def count_images_in_folder(folder: Path) -> int:
     return sum(1 for p in folder.iterdir() if p.is_file() and p.suffix.lower() in ALLOWED_EXTS)
 
 # --- Routes ---
+
+BACKUP_TOKEN = os.getenv("BACKUP_TOKEN")  # set this in Render env vars
+
+@app.get("/download_data")
+async def download_data(request: Request):
+    # token check
+    token = request.query_params.get("token")
+    if BACKUP_TOKEN:
+        if not token or token != BACKUP_TOKEN:
+            raise HTTPException(status_code=401, detail="Unauthorized")
+    # create zip archive (writes to app working dir)
+    archive_base = "data_backup"
+    archive_file = f"{archive_base}.zip"
+    # Remove old archive if exists
+    try:
+        if os.path.exists(archive_file):
+            os.remove(archive_file)
+        shutil.make_archive(archive_base, "zip", DATA_FOLDER)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create archive: {e}")
+    return FileResponse(archive_file, media_type="application/zip", filename=archive_file)
 @app.get("/", response_class=HTMLResponse)
 async def upload_form():
     # Minimal changes: make layout responsive and keep header image big (image src unchanged).
