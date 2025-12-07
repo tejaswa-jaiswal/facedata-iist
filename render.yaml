@@ -2,8 +2,8 @@ services:
   - type: web
     name: facedata-iist
     env: python
-    region: oregon     # or "singapore" / "frankfurt" etc.
     plan: free
+    region: oregon
 
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
@@ -11,10 +11,13 @@ services:
     autoDeploy: true
 
     envVars:
-      DATA_FOLDER: /data
-      UPLOAD_FOLDER: /uploads
+      - key: DATA_FOLDER
+        value: /data
 
-    # Uncomment this if you want persistent storage for images:
+      - key: UPLOAD_FOLDER
+        value: /uploads
+
+    # Uncomment if you want persistent disk storage:
     # disks:
     #   - name: data-disk
     #     mountPath: /data
